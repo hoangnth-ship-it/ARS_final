@@ -1,18 +1,18 @@
 # Parkinson Detection from Speech — Whisper + BERT + Hand-crafted
 
 Reproducible, leakage-safe benchmark for classifying **Parkinson (PD) vs Healthy
-Control (HC)** from English speech, addressing the five review points (C1–C5) in
-`MASTER_PROMPT.md`. Every number is produced by code and reproducible with one command.
+Control (HC)** from English speech. Every number is produced by code and
+reproducible with one command.
 
-## What this addresses (teacher's 5 points)
+## Design goals
 
-| # | Criticism | Where it's handled |
-|---|---|---|
-| **C1** | "no comparison of related methods" | 15+ models under one protocol (`src/pipelines/`), stat tests (`src/stats/`), sweep (`src/sweep/`) |
-| **C2** | "re-run / re-implement prior methods" | `src/models/paper_baselines.py` (Little/Tsanas/Vasquez/Moro) + NeuroVoz CNN |
-| **C3** | "no literature review" | `docs/related_work.md` (table + critical analysis) |
-| **C4** | "no model diagrams" | `artifacts/figures/architecture_diagrams.md` (Mermaid) + result plots |
-| **C5** | rigor / reproducibility | subject-wise CV, train-only scaler, confound audit, ≥3 seeds, cache-keys |
+| Goal | Where it's handled |
+|---|---|
+| Fair multi-model comparison | 16 models under one protocol (`src/pipelines/`), statistical tests (`src/stats/`), architecture sweep (`src/sweep/`) |
+| Prior-work reproduction | `src/models/paper_baselines.py` (Little / Tsanas / Vasquez / Moro) + NeuroVoz-style CNN |
+| Systematic literature review | `docs/related_work.md` (comparison table + critical analysis) |
+| Architecture & result diagrams | `artifacts/figures/architecture_diagrams.md` (Mermaid) + result plots |
+| Rigor & reproducibility | subject-wise CV, train-only scaler, confound audit, ≥3 seeds, cache-keys |
 
 ## Dataset (verified from `Data/`)
 
@@ -35,13 +35,13 @@ python run.py all --fast     # end-to-end smoke run (CPU, minutes; subsampled)
 python run.py all            # full run (GPU advised)
 # or step by step:
 python run.py manifest       # -> artifacts/manifest.csv
-python run.py confound       # -> confound audit  [C5]
+python run.py confound       # -> confound audit
 python run.py features --which all
-python run.py baselines      # ML + paper baselines  [C1][C2]
+python run.py baselines      # ML + paper baselines
 python run.py deep           # CNN / Wav2Vec2 / fusion  [C/D/E]
-python run.py stats          # McNemar + Friedman  [C1]
+python run.py stats          # McNemar + Friedman
 python run.py sweep          # feature/arch size ablation  [Sec 8]
-python run.py figures        # all figures  [C4]
+python run.py figures        # all figures
 python run.py report         # docs/RESULTS.md
 pytest -q                    # acceptance tests
 ```
@@ -61,7 +61,7 @@ Full diagrams: `artifacts/figures/architecture_diagrams.md`.
 ## Models compared (`configs/models.yaml`)
 
 - **A. Classic ML:** SVM-RBF, RandomForest, XGBoost, LogisticRegression, KNN.
-- **B. Prior-work re-implementations [C2]:** Little(2009), Tsanas(2012), Vasquez(2018),
+- **B. Prior-work re-implementations:** Little(2009), Tsanas(2012), Vasquez(2018),
   Moro(2019), NeuroVoz(2024).
 - **C. CNN spectrogram:** ResNet-like MelCNN, MobileNet-style.
 - **D. Self-supervised:** Wav2Vec2 (frozen embedding + MLP).
@@ -70,7 +70,7 @@ Full diagrams: `artifacts/figures/architecture_diagrams.md`.
 Every model: subject-wise CV, train-only `StandardScaler`, ≥3 seeds, per-utterance
 predictions saved; metrics reported at utterance **and** subject level.
 
-## Confound audit ([C5])
+## Confound audit
 
 `src/audit/confound_check.py` trains metadata-only and spectral-fingerprint probes
 before/after band-limiting. On this corpus band-limiting alone does **not** fully remove
@@ -97,7 +97,7 @@ output-dim → `artifacts/results/sweep_results.csv` + Pareto plots.
 ```
 configs/   config.yaml, models.yaml, sweep.yaml
 src/       data/ preprocess/ audit/ features/ models/ eval/ stats/ sweep/ figures/ pipelines/
-docs/      related_work.md [C3], RESULTS.md (auto)
+docs/      related_work.md, RESULTS.md (auto)
 tests/     pytest acceptance tests
 run.py     one-command driver ; Makefile mirrors it
 ```
