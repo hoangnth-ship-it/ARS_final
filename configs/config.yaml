@@ -1,0 +1,96 @@
+# =============================================================================
+# Central config for the Parkinson-detection pipeline.
+# Every number that governs preprocessing, features, and evaluation lives here.
+# Nothing in src/ hardcodes these values.  [C5: reproducibility]
+# =============================================================================
+
+seed: 42
+seeds: [42, 7, 123]          # >=3 seeds for final results (Sec 5.5)
+
+paths:
+  data_root: "Data"
+  # Which variant of each class to use by default (Sec 1).
+  pd_variant: "denoised"     # original | denoised
+  hc_variant: "cleaned"      # original | cleaned
+  manifest: "artifacts/manifest.csv"
+  cache_dir: "artifacts/cache"          # feature cache (Sec 8 cache-key)
+  preprocessed_dir: "artifacts/preprocessed"
+  results_dir: "artifacts/results"
+  figures_dir: "artifacts/figures"
+  logs_dir: "artifacts/logs"
+
+# ---------------------------------------------------------------------------
+# Preprocessing (Sec 2) -- every step toggleable so confound audit can sweep it.
+# ---------------------------------------------------------------------------
+preprocess:
+  target_sample_rate: 16000
+  mono: true
+  band_limit:
+    enabled: true
+    cutoff_hz: 7500          # low-pass BOTH classes -> erase sample-rate fingerprint
+    order: 8
+  loudness:
+    enabled: true
+    method: "lufs"           # lufs | rms  (rms fallback if pyloudnorm missing)
+    target_lufs: -23.0
+    target_rms: 0.05
+  vad:
+    enabled: true
+    method: "energy"         # energy | webrtc
+    top_db: 30               # librosa energy trim threshold
+    frame_ms: 30             # webrtc frame
+    aggressiveness: 2        # webrtc 0..3
+  fixed_length:
+    enabled: true
+    max_duration_s: 6.0      # pad / center-crop to this
+    pad_mode: "center"       # center | end
+
+# ---------------------------------------------------------------------------
+# Feature extraction (Sec 3).  Cache-key fields marked below (Sec 8.2).
+# ---------------------------------------------------------------------------
+features:
+  # cache-key inputs -- changing any of these -> new cache -> re-extract
+  sample_rate: 16000
+  n_mels: 80
+  n_fft: 400
+  hop_length: 160
+  win_length: 400
+  n_frames: 600              # fixed time steps for spectrogram/CNN
+  n_mfcc: 40
+
+  whisper_model: "openai/whisper-base"
+  whisper_layer: "last"      # last | mid  (which encoder hidden state)
+  wav2vec2_model: "facebook/wav2vec2-base-960h"
+  bert_model: "bert-base-uncased"
+
+  handcrafted_enabled: true
+  opensmile_enabled: true    # auto-skipped if opensmile not installed
+  disvoice_enabled: false    # heavy; off by default
+
+# ---------------------------------------------------------------------------
+# Evaluation protocol (Sec 5)
+# ---------------------------------------------------------------------------
+eval:
+  cv: "loso"                 # loso | sgkf
+  k_folds: 5                 # used only when cv == sgkf
+  inner_val_frac: 0.2        # speaker-wise inner val for early stopping
+  drop_emma: false           # Sec 5.4 sensitivity: also run with true
+  class_weight: true
+  calibrate: true            # Platt scaling / threshold tuning on val
+
+train:
+  epochs: 40
+  patience: 8
+  batch_size: 16
+  lr_head: 1.0e-3
+  lr_pretrained: 1.0e-5
+  weight_decay: 1.0e-4
+  dropout: 0.3
+  device: "auto"             # auto | cpu | cuda
+
+# ---------------------------------------------------------------------------
+# Confound audit (Sec 2)
+# ---------------------------------------------------------------------------
+confound:
+  metadata_cols: ["orig_sample_rate", "orig_duration_s", "orig_num_channels"]
+  chance_tol: 0.10           # metadata-only acc within 0.5 +/- tol => "clean"

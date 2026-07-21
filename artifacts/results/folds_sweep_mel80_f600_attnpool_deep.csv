@@ -1,0 +1,6 @@
+accuracy,model,seed,fold,n_test
+0.9866666666666667,sweep_mel80_f600_attnpool_deep,42,0,150
+0.4551148225469729,sweep_mel80_f600_attnpool_deep,42,1,479
+0.9396551724137931,sweep_mel80_f600_attnpool_deep,42,2,116
+0.6787878787878788,sweep_mel80_f600_attnpool_deep,42,3,165
+0.9060773480662984,sweep_mel80_f600_attnpool_deep,42,4,181

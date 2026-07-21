@@ -1,0 +1,29 @@
+# Model registry (Sec 4).  All models run under the SAME CV / scaler / metric.
+# feature_group refers to a cached feature set produced by src/features/*.
+
+models:
+  # A. classic ML on tabular features (handcrafted acoustic + linguistic)
+  - {name: svm_rbf,      family: ml, estimator: svm,      feature_group: tabular, tag: A}
+  - {name: random_forest,family: ml, estimator: rf,       feature_group: tabular, tag: A}
+  - {name: xgboost,      family: ml, estimator: xgb,      feature_group: tabular, tag: A}
+  - {name: logreg,       family: ml, estimator: logreg,   feature_group: tabular, tag: A}
+  - {name: knn,          family: ml, estimator: knn,      feature_group: tabular, tag: A}
+
+  # B. re-implemented paper baselines  [C2]
+  - {name: little2009,   family: paper, feature_group: dysphonia, tag: B}
+  - {name: tsanas2012,   family: paper, feature_group: dysphonia, tag: B}
+  - {name: vasquez2018,  family: paper, feature_group: disvoice,  tag: B}
+  - {name: moro2019,     family: paper, feature_group: mfcc_seq,  tag: B}
+  - {name: neurovoz2024, family: paper, feature_group: melspec,   tag: B}
+
+  # C. CNN on spectrogram (ImageNet pretrained, FROZEN backbone -> embedding + head)
+  - {name: resnet18,     family: cnn_emb, feature_group: resnet18_emb,    tag: C}
+  - {name: mobilenetv2,  family: cnn_emb, feature_group: mobilenetv2_emb, tag: C}
+
+  # D. self-supervised
+  - {name: wav2vec2,     family: ssl, feature_group: wav2vec2_emb, tag: D}
+
+  # E. proposed fusion model
+  - {name: fusion_concat,   family: fusion, fusion: concat,          feature_group: multi, tag: E}
+  - {name: fusion_xattn,    family: fusion, fusion: cross_attention, feature_group: multi, tag: E}
+  - {name: fusion_gated,    family: fusion, fusion: gated,           feature_group: multi, tag: E}

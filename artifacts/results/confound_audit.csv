@@ -1,0 +1,4 @@
+probe,n,accuracy,chance_tol,band_limited_clean
+1_metadata_only,1091,1.0,0.1,False
+2_spectral_resample_only,1091,0.9858,0.1,False
+3_spectral_band_limited,1091,0.9836,0.1,False

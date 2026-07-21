@@ -1,0 +1,29 @@
+# Core
+numpy>=1.24
+pandas>=2.0
+scipy>=1.10
+scikit-learn>=1.3
+pyyaml>=6.0
+tqdm>=4.66
+matplotlib>=3.7
+
+# Audio
+soundfile>=0.12
+librosa>=0.10
+# torchaudio  # optional; librosa/soundfile used as fallback for resample/io
+pyloudnorm>=0.1    # optional; RMS fallback if missing
+webrtcvad>=2.0     # optional; energy-VAD fallback if missing
+
+# Acoustic / standard voice-pathology feature sets
+praat-parselmouth>=0.4
+opensmile>=2.4     # optional; eGeMAPS/ComParE. skipped with warning if missing
+# disvoice         # optional; articulation/phonation/prosody (Vasquez re-impl). skipped if missing
+
+# ML / DL
+torch>=2.0
+transformers>=4.40   # Whisper encoder, Wav2Vec2, BERT
+xgboost>=2.0
+
+# Profiling (Section 9)
+thop>=0.1          # optional; params-only fallback if missing
+psutil>=5.9        # optional; CPU memory

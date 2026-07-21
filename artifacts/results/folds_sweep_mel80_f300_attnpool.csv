@@ -1,0 +1,6 @@
+accuracy,model,seed,fold,n_test
+0.4,sweep_mel80_f300_attnpool,42,0,30
+0.8333333333333334,sweep_mel80_f300_attnpool,42,1,24
+0.9666666666666667,sweep_mel80_f300_attnpool,42,2,30
+0.25,sweep_mel80_f300_attnpool,42,3,24
+0.875,sweep_mel80_f300_attnpool,42,4,24

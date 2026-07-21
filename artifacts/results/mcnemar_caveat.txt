@@ -1,0 +1,1 @@
+Utterances from the same speaker are not independent; McNemar is anti-conservative here (Sec 6.2).

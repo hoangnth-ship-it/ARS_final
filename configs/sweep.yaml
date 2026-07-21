@@ -1,0 +1,24 @@
+# Feature / architecture size ablation (Sec 9).  Variants grouped by cache-key;
+# feature extracted once per input group, reused across arch-only variants.
+
+sweep:
+  shared:
+    model: cnn_resnet_like
+    cv: loso
+    seeds: [42, 7, 123]
+  variants:
+    - name: mel40_f200_avgpool
+      input: {n_mels: 40, n_frames: 200, hop_length: 160, n_fft: 400, win_length: 400}
+      arch:  {pooling: avg, padding: same, blocks: 4, widths: [16, 32, 64, 128], dropout: 0.3}
+
+    - name: mel80_f300_attnpool
+      input: {n_mels: 80, n_frames: 300, hop_length: 160, n_fft: 400, win_length: 400}
+      arch:  {pooling: attention, padding: same, blocks: 4, widths: [16, 32, 64, 128], dropout: 0.3}
+
+    - name: mel80_f300_maxpool_valid       # same input cache as above -> REUSE
+      input: {n_mels: 80, n_frames: 300, hop_length: 160, n_fft: 400, win_length: 400}
+      arch:  {pooling: max, padding: valid, blocks: 5, widths: [16, 32, 64, 128, 256], dropout: 0.3}
+
+    - name: mel80_f600_attnpool_deep
+      input: {n_mels: 80, n_frames: 600, hop_length: 160, n_fft: 400, win_length: 400}
+      arch:  {pooling: attention, padding: same, blocks: 5, widths: [16, 32, 64, 128, 256], dropout: 0.4}
